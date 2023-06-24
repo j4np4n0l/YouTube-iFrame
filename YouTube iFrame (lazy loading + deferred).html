@@ -1,0 +1,57 @@
+ <!-- Add a CSS style to hide the iframe initially -->
+<style>
+  .video-container {
+    position: relative;
+    max-width: 600px;
+    width: 100%;
+    height: 320px;
+    margin: 0 auto;
+  }
+  .video-container > iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<!-- Add Intersection Observer polyfill (if needed) -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=IntersectionObserver"></script>
+
+<script>
+  // Intersection Observer callback function
+  function loadYouTubePlayer(entries, observer) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        // Load the YouTube player
+        var iframe = entry.target.querySelector("#yt_iframe");
+        var src = iframe.getAttribute("data-src");
+        iframe.setAttribute("src", src);
+        observer.unobserve(entry.target);
+      }
+    });
+  }
+
+  // Lazy load YouTube players when they become visible in the viewport
+  var observer = new IntersectionObserver(loadYouTubePlayer, {
+    rootMargin: "0px",
+    threshold: 0.1
+  });
+
+  window.addEventListener("DOMContentLoaded", function () {
+    var videoContainers = document.querySelectorAll(".video-container");
+    videoContainers.forEach(function (container) {
+      var iframe = container.querySelector("#yt_iframe");
+      var src = iframe.getAttribute("data-src");
+      iframe.removeAttribute("src");
+      iframe.setAttribute("data-src", src);
+      observer.observe(container);
+    });
+  });
+</script>
+
+<!-- Place the YouTube embed code inside a <div> container with a data-src attribute -->
+<div class="video-container">
+  <iframe id="yt_iframe" data-src="https://www.youtube.com/embed/VyaHwvPWuZU" frameborder="0" allowfullscreen></iframe>
+</div>
